@@ -36,7 +36,7 @@ CREATE TABLE ExhaustiveTest (
 	v ExhaustiveInt not null
 );
 insert into ExhaustiveTest 
-values ('100'), (null), (cast(100 as int));
+values ('100'), (null);
 
 select id, v, v.ToString(), v.IsUnknown() from ExhaustiveTest;
 
