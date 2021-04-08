@@ -27,16 +27,32 @@ FROM @path + 'ExhaustiveTypes' + @version + '.dll'
 WITH PERMISSION_SET = SAFE;
 
 CREATE TYPE ExhaustiveInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveInt;
-
+CREATE TYPE ExhaustiveBigInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveBigInt;
+----------------------------------------------------
+-- reset
+DROP TABLE ExhaustiveTest;
+DROP TYPE ExhaustiveInt;
+DROP TYPE ExhaustiveBigInt;
+DROP ASSEMBLY ExhaustiveTypes;
+----------------------------------------------------
 IF OBJECT_ID('ExhaustiveTest') IS NOT NULL
 DROP TABLE ExhaustiveTest;
 
 CREATE TABLE ExhaustiveTest (
 	id int identity(1,1) not null,
-	v ExhaustiveInt not null
+	ex_int ExhaustiveInt not null, 
+	ex_bigint ExhaustiveBigInt not null
 );
-insert into ExhaustiveTest 
-values ('100'), (null);
+insert into ExhaustiveTest (ex_int, ex_bigint)
+values 
+('100', '12345678901234567'), 
+(null, null);
 
-select id, v, v.ToString(), v.IsUnknown() from ExhaustiveTest;
+select 
+	id, 
+	ex_int, ex_int.ToString(), ex_int.IsUnknown(), 
+	ex_bigint, ex_bigint.ToString(), ex_bigint.IsUnknown() 
+from 
+	ExhaustiveTest;
+
 

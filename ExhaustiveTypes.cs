@@ -12,52 +12,71 @@ using Microsoft.SqlServer.Server;
     ValidationMethodName = "Validate"
 )]  
 public struct ExhaustiveInt : INullable {  
-    private Int32   the_value;  
-    private bool    is_unknown;
-  
+    private SqlInt32 the_value;    
     public bool IsNull { 
         get {
             return false; 
         }
     }  
-
     public static ExhaustiveInt Null {  
         get {  
-            ExhaustiveInt an_exhaustive_int = new ExhaustiveInt();  
-            an_exhaustive_int.is_unknown = true;
-            an_exhaustive_int.the_value = 0;
-            return an_exhaustive_int;  
+            ExhaustiveInt an_exhaustive = new ExhaustiveInt();  
+            an_exhaustive.the_value = SqlInt32.Null;
+            return an_exhaustive;  
         }  
     }  
-    
     public static ExhaustiveInt Parse(SqlString string_value) {
         ExhaustiveInt v = new ExhaustiveInt();  
-        if(string_value.IsNull) {
-            v.is_unknown = true;
-            v.the_value = 0;
-        }
-        else {
-            v.is_unknown = false;
-            v.the_value = Int32.Parse(string_value.Value);
-        }
+        v.the_value = string_value.IsNull ? SqlInt32.Null : SqlInt32.Parse(string_value.Value);
         return v;
     }
-
     public override string ToString()  {  
-        if (this.is_unknown)  
-            return "Unknown";  
-        else 
-            return this.the_value.ToString(); 
+        return this.the_value.IsNull ? "Unknown" : this.the_value.ToString(); 
     }  
-
     private bool Validate()  {  
         return true;  
     }  
-  
     [SqlMethod(OnNullCall = false)]  
     public bool IsUnknown()  {  
-        return this.is_unknown;  
+        return this.the_value.IsNull;  
     }  
 }  
 
-
+[Serializable]  
+[Microsoft.SqlServer.Server.SqlUserDefinedType(
+    Format.Native,  
+    IsByteOrdered = true, 
+    IsFixedLength = true,
+    Name = "ExhaustiveBigInt",
+    ValidationMethodName = "Validate"
+)]  
+public struct ExhaustiveBigInt : INullable {  
+    private SqlInt64 the_value;    
+    public bool IsNull { 
+        get {
+            return false; 
+        }
+    }  
+    public static ExhaustiveBigInt Null {  
+        get {  
+            ExhaustiveBigInt an_exhaustive = new ExhaustiveBigInt();  
+            an_exhaustive.the_value = SqlInt64.Null;
+            return an_exhaustive;  
+        }  
+    }  
+    public static ExhaustiveBigInt Parse(SqlString string_value) {
+        ExhaustiveBigInt v = new ExhaustiveBigInt();  
+        v.the_value = string_value.IsNull ? SqlInt64.Null : SqlInt64.Parse(string_value.Value);
+        return v;
+    }
+    public override string ToString()  {  
+        return this.the_value.IsNull ? "Unknown" : this.the_value.ToString(); 
+    }  
+    private bool Validate()  {  
+        return true;  
+    }  
+    [SqlMethod(OnNullCall = false)]  
+    public bool IsUnknown()  {  
+        return this.the_value.IsNull;  
+    }  
+}  
