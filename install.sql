@@ -55,4 +55,12 @@ select
 from 
 	ExhaustiveTest;
 
-
+declare @unknown_bigint ExhaustiveBigInt = ExhaustiveBigInt::Unknown();
+select 
+	id, 
+	ex_int, ex_int.ToString(), ex_int.IsUnknown(), 
+	ex_bigint, ex_bigint.ToString(), ex_bigint.IsUnknown() 
+from 
+	ExhaustiveTest
+where 
+	ex_bigint = @unknown_bigint;

@@ -25,6 +25,9 @@ public struct ExhaustiveInt : INullable {
             return an_exhaustive;  
         }  
     }  
+    public static ExhaustiveInt Unknown() {
+        return Parse(SqlString.Null);
+    }
     public static ExhaustiveInt Parse(SqlString string_value) {
         ExhaustiveInt v = new ExhaustiveInt();  
         v.the_value = string_value.IsNull ? SqlInt32.Null : SqlInt32.Parse(string_value.Value);
@@ -64,6 +67,9 @@ public struct ExhaustiveBigInt : INullable {
             return an_exhaustive;  
         }  
     }  
+    public static ExhaustiveBigInt Unknown() {
+        return Parse(SqlString.Null);
+    }
     public static ExhaustiveBigInt Parse(SqlString string_value) {
         ExhaustiveBigInt v = new ExhaustiveBigInt();  
         v.the_value = string_value.IsNull ? SqlInt64.Null : SqlInt64.Parse(string_value.Value);
