@@ -27,40 +27,35 @@ FROM @path + 'ExhaustiveTypes' + @version + '.dll'
 WITH PERMISSION_SET = SAFE;
 
 CREATE TYPE ExhaustiveInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveInt;
-CREATE TYPE ExhaustiveBigInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveBigInt;
 ----------------------------------------------------
 -- reset
 DROP TABLE ExhaustiveTest;
 DROP TYPE ExhaustiveInt;
-DROP TYPE ExhaustiveBigInt;
 DROP ASSEMBLY ExhaustiveTypes;
 ----------------------------------------------------
 IF OBJECT_ID('ExhaustiveTest') IS NOT NULL
 DROP TABLE ExhaustiveTest;
 
+DECLARE @unknown_int ExhaustiveInt = ExhaustiveInt::Type('Unknown');
+select @unknown_int;
+
 CREATE TABLE ExhaustiveTest (
 	id int identity(1,1) not null,
-	ex_int ExhaustiveInt not null, 
-	ex_bigint ExhaustiveBigInt not null
+	ex_int ExhaustiveInt not null
 );
-insert into ExhaustiveTest (ex_int, ex_bigint)
+insert into ExhaustiveTest (ex_int)
 values 
-('100', '12345678901234567'), 
-(null, null);
+('100'), (null); -- , (@unknown_int); -- TODO!
 
 select 
-	id, 
-	ex_int, ex_int.ToString(), ex_int.IsUnknown(), 
-	ex_bigint, ex_bigint.ToString(), ex_bigint.IsUnknown() 
+	*, 
+	ex_int.ToString(), 
+	ex_int.IsType('Known'), 
+	ex_int.IsType('NULL'), 
+	ex_int.IsType('Unknown'), 
+--	case when ex_int = ExhaustiveInt::Type('Known') then 'Y' else 'N' end, 
+	case when ex_int = ExhaustiveInt::Type('NULL') then 'Y' else 'N' end,
+	case when ex_int = ExhaustiveInt::Type('Unknown') then 'Y' else 'N' end
 from 
 	ExhaustiveTest;
 
-declare @unknown_bigint ExhaustiveBigInt = ExhaustiveBigInt::Unknown();
-select 
-	id, 
-	ex_int, ex_int.ToString(), ex_int.IsUnknown(), 
-	ex_bigint, ex_bigint.ToString(), ex_bigint.IsUnknown() 
-from 
-	ExhaustiveTest
-where 
-	ex_bigint = @unknown_bigint;
