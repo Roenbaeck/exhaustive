@@ -82,8 +82,8 @@ public static class ExhaustiveTypeFactory {
     ValidationMethodName = "Validate"
 )]  
 public struct ExhaustiveInt : INullable {  
-    public ushort the_type;
-    public SqlInt32 the_value;
+    private ushort the_type;
+    private SqlInt32 the_value; 
     // This is the spirit of #nevernull
     public bool IsNull { 
         get {
@@ -123,6 +123,11 @@ public struct ExhaustiveInt : INullable {
     }      
     public bool Validate() {  
         return true;  
-    }              
+    }        
+    public SqlInt32 Value {
+        get {
+            return the_value;
+        }
+    }
 }  
 
