@@ -1,3 +1,20 @@
+-- reset types
+IF TYPE_ID('ExhaustiveBit') IS NOT NULL DROP TYPE ExhaustiveBit;
+IF TYPE_ID('ExhaustiveTinyInt') IS NOT NULL DROP TYPE ExhaustiveTinyInt;
+IF TYPE_ID('ExhaustiveSmallInt') IS NOT NULL DROP TYPE ExhaustiveSmallInt;
+IF TYPE_ID('ExhaustiveInt') IS NOT NULL DROP TYPE ExhaustiveInt;
+IF TYPE_ID('ExhaustiveBigInt') IS NOT NULL DROP TYPE ExhaustiveBigInt;
+IF TYPE_ID('ExhaustiveSingle') IS NOT NULL DROP TYPE ExhaustiveSingle;
+IF TYPE_ID('ExhaustiveDouble') IS NOT NULL DROP TYPE ExhaustiveDouble;
+IF TYPE_ID('ExhaustiveDecimal') IS NOT NULL DROP TYPE ExhaustiveDecimal;
+IF TYPE_ID('ExhaustiveMoney') IS NOT NULL DROP TYPE ExhaustiveMoney;
+IF TYPE_ID('ExhaustiveDateTime') IS NOT NULL DROP TYPE ExhaustiveDateTime;
+IF TYPE_ID('ExhaustiveDateTime2') IS NOT NULL DROP TYPE ExhaustiveDateTime2;
+
+-- reset assembly
+IF EXISTS(SELECT name FROM sys.assemblies WHERE name = 'ExhaustiveTypes')
+DROP ASSEMBLY ExhaustiveTypes;
+
 -- Set this to the path containing the ExhaustiveTypesXXXX.DLL files
 DECLARE @path varchar(max) = 'S:\Sisula\exhaustive\';
 
@@ -26,36 +43,16 @@ AUTHORIZATION dbo
 FROM @path + 'ExhaustiveTypes' + @version + '.dll'
 WITH PERMISSION_SET = SAFE;
 
+CREATE TYPE ExhaustiveBit EXTERNAL NAME ExhaustiveTypes.ExhaustiveBit;
+CREATE TYPE ExhaustiveTinyInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveTinyInt;
+CREATE TYPE ExhaustiveSmallInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveSmallInt;
 CREATE TYPE ExhaustiveInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveInt;
-----------------------------------------------------
--- reset
-DROP TABLE ExhaustiveTest;
-DROP TYPE ExhaustiveInt;
-DROP ASSEMBLY ExhaustiveTypes;
-----------------------------------------------------
-IF OBJECT_ID('ExhaustiveTest') IS NOT NULL
-DROP TABLE ExhaustiveTest;
+CREATE TYPE ExhaustiveBigInt EXTERNAL NAME ExhaustiveTypes.ExhaustiveBigInt;
+CREATE TYPE ExhaustiveSingle EXTERNAL NAME ExhaustiveTypes.ExhaustiveSingle;
+CREATE TYPE ExhaustiveDouble EXTERNAL NAME ExhaustiveTypes.ExhaustiveDouble;
+CREATE TYPE ExhaustiveDecimal EXTERNAL NAME ExhaustiveTypes.ExhaustiveDecimal;
+CREATE TYPE ExhaustiveMoney EXTERNAL NAME ExhaustiveTypes.ExhaustiveMoney;
+CREATE TYPE ExhaustiveDateTime EXTERNAL NAME ExhaustiveTypes.ExhaustiveDateTime;
+CREATE TYPE ExhaustiveDateTime2 EXTERNAL NAME ExhaustiveTypes.ExhaustiveDateTime2;
 
-DECLARE @an_int int;
-DECLARE @unknown_int ExhaustiveInt = ExhaustiveInt::Type('Unknown');
-
-CREATE TABLE ExhaustiveTest (
-	id int identity(1,1) not null,
-	ex_int ExhaustiveInt not null
-);
-insert into ExhaustiveTest (ex_int)
-values 
-('100'), (case when @an_int is null then @unknown_int else ExhaustiveInt::Parse(@an_int) end); 
-
-select 
-	*, 
-	ex_int.Value as Value,
-	ex_int.ToString() as String, 
-	ex_int.IsType('Known') as isKnownType, 
-	ex_int.IsType('NULL') as isNULLType, 
-	ex_int.IsType('Unknown') as isUnknownType, 
-	case when ex_int = ExhaustiveInt::Type('NULL') then 'Y' else 'N' end as equalsNULL,
-	case when ex_int = ExhaustiveInt::Type('Unknown') then 'Y' else 'N' end as equalsUnknown
-from 
-	ExhaustiveTest;
 
